@@ -11,31 +11,43 @@ Also, if you are reading a dataset using an API or some other means, feel free t
 
 ## Requirements 
 Please make sure that you have installed [Python 3](https://www.python.org/downloads/). To install 3rd party dependency follow the instructions bellow: 
-
-  * Numpy
-
-    In your terminal window type the following: `$ pip install numpy`.
   
-  * Pandas
+  * Install Jupiter for interactive prototyping (http://jupyter.org/install.html):
 
-    In your terminal window type the following: `$ pip install pandas`.
+    Install using: 
+      `python3 -m pip install jupyter`
+    Start using: 
+      `jupyter notebook` OR `python3 -m IPython notebook`
 
-  * Plotly
+  * Install all dependencies by running:
 
-    In your terminal window type the following: `$ pip install plotly`. 
-  
-  * Matplotlib
+    In your terminal window type the following: `pip install -r requirements.txt`
 
-    In your terminal window type the following commands: 
-    ```
-    $ python -mpip install -U pip
-    $ python -mpip install -U matplotlib
-    ```
+  * OR install all dependencies seperatelly: 
+    * Numpy
 
-  * Basemap (optional)
+      In your terminal window type the following: `$ pip install numpy`.
+    
+    * Pandas
 
-    Installing this is a bit more complicated, but the [documentation](https://matplotlib.org/basemap/users/installing.html#installation) is pretty lit.
+      In your terminal window type the following: `$ pip install pandas`.
 
-  * Folium
+    * Plotly
 
-    In your terminal window type the following: `$ pip install folium`. 
+      In your terminal window type the following: `$ pip install plotly`. 
+    
+    * Matplotlib
+
+      In your terminal window type the following commands: 
+      ```
+      $ python -mpip install -U pip
+      $ python -mpip install -U matplotlib
+      ```
+
+    * Basemap (optional)
+
+      Installing this is a bit more complicated, but the [documentation](https://matplotlib.org/basemap/users/installing.html#installation) is pretty lit.
+
+    * Folium
+
+      In your terminal window type the following: `$ pip install folium`. 
