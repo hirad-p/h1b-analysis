@@ -15,11 +15,11 @@ top_cities = h1b_frame['WORKSITE'].value_counts()[:100]
 
 for worksite, count in top_cities.items():
     state = worksite.split(',')[1].strip().lower().title()
-    states_frame.at[state, 'count'] = count
+    states_frame.at[state, 'count'] += count
 states_frame = states_frame[states_frame['count'] != 0]
 
 # plot
-map_data = '/Users/hirad/Dev/h1b-analysis/data/map/us_states.json'
+map_data = '/Users/hirad.pourtahmasbi/Dev/h1b-analysis/data/map/us_states.json'
 m = folium.Map(location=[37, -102], zoom_start=5)
 
 m.choropleth(
