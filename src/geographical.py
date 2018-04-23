@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import plotly.plotly as py
 import plotly.figure_factory as ff
+import plotly.graph_objs as go
 
 from geopy.geocoders import Nominatim
 
@@ -11,6 +12,7 @@ geolocator = Nominatim(scheme='http')
 
 # read the files into dataframes
 h1b_frame = pd.read_csv('../data/h1b.csv') # dataset to large, please download from README.md
+
 
 #### Applications by State #####
 ####    Certified / Map    #####
@@ -49,6 +51,7 @@ def number_by_states(frame):
     folium.LayerControl().add_to(m)
 
     m.save('../graphs/applications_by_states.html')
+
 
 def number_by_state(frame, state):
     print(f'{state} - Applications by County')
@@ -117,6 +120,51 @@ def number_by_state(frame, state):
 
     py.image.save_as(fig, filename=f'../graphs/{scope}.png')
 
+
+def employer_by_state(frame):
+    geo_frame = pd.read_csv('../data/state_geocodes.csv')
+
+    states_frame = geo_frame.drop('fips', axis=1)
+    states_frame['top_employer'] = ''
+    states_frame['count'] = 0
+    states_frame = states_frame.set_index('name')
+
+    for state in states_frame.index:
+        print(f'Computing {state}...')
+        data = frame[frame['CASE_STATUS'] == 'CERTIFIED'][frame['WORKSITE'].str.contains(state.upper())]
+        counts = data['EMPLOYER_NAME'].value_counts()
+        top_employer = counts.keys().tolist()[0]
+        top_count = counts.tolist()[0]
+        states_frame.at[state, 'top_employer'] = top_employer
+        states_frame.at[state, 'count'] = top_count
+
+    states_frame = states_frame.sort_values('count')
+    print(states_frame)
+
+    X = states_frame[['code']].values.flatten()
+    Y = states_frame[['count']].values.flatten()
+    text = states_frame[['top_employer']].values.flatten()
+
+    trace_states = go.Bar(
+        x=X, 
+        y=Y, 
+        name="State", 
+        text=text, 
+        textposition = 'auto')
+
+    data = [trace_states]
+    layout = go.Layout(
+        title="H1Bs by State",
+        barmode='stack'  
+    )
+    fig = go.Figure(
+        data=data, 
+        layout=layout
+    )
+    py.iplot(fig, filename='stacked-bar')
+    py.image.save_as(fig, filename=f'../graphs/employer_by_state.png')
+
+
 def get_county(coordinate):
     location = geolocator.reverse(f'{coordinate[0]}, {coordinate[1]}')
     return location.raw['address']['county']
@@ -125,5 +173,4 @@ def get_county(coordinate):
 # number_by_state(h1b_frame, 'California')
 # number_by_state(h1b_frame, 'Texas')
 # number_by_state(h1b_frame, 'New York')
-
-
+# employer_by_state(h1b_frame)
