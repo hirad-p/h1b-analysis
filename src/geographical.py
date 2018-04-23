@@ -139,7 +139,7 @@ def employer_by_state(frame):
         states_frame.at[state, 'count'] = top_count
 
     states_frame = states_frame.sort_values('count')
-    print(states_frame)
+    # print(states_frame)
     states_frame.to_csv('../data/top_employer_by_state.csv')
 
     X = states_frame[['code']].values.flatten()
@@ -166,12 +166,44 @@ def employer_by_state(frame):
     py.image.save_as(fig, filename=f'../graphs/employer_by_state.png')
 
 
+def salary_by_employer(frame):
+    data = frame[frame['CASE_STATUS'] == 'CERTIFIED']
+    df = pd.read_csv('../data/top_employer_by_state.csv')
+    df = df.set_index('name')
+
+    for state, row in df.iterrows():
+        employer = row['top_employer']
+        wages = data[data['WORKSITE'].str.contains(state.upper())][data['EMPLOYER_NAME'] == employer]['PREVAILING_WAGE']
+        df.at[state, 'average_salary'] = round(wages.mean(), 2)
+        
+    map_data = '/Users/hirad.pourtahmasbi/Dev/h1b-analysis/data/map/us_states.json'
+    m = folium.Map(location=[37, -102], zoom_start=4)
+
+    m.choropleth(
+        geo_data=map_data,
+        name='2011-2016 Average Salary of Top Employer per State',
+        data=df,
+        columns=['code', 'average_salary'],
+        key_on='feature.id',
+        fill_color='YlGn',
+        fill_opacity=0.7,
+        line_opacity=0.2,
+        legend_name='Average Salary'
+    )
+    folium.LayerControl().add_to(m)
+    m.save('../graphs/salary_by_employer_by_state.html')
+
+    print(df.style)
+
+
 def get_county(coordinate):
     location = geolocator.reverse(f'{coordinate[0]}, {coordinate[1]}')
     return location.raw['address']['county']
+
 
 # number_by_states(h1b_frame)
 # number_by_state(h1b_frame, 'California')
 # number_by_state(h1b_frame, 'Texas')
 # number_by_state(h1b_frame, 'New York')
-employer_by_state(h1b_frame)
+# employer_by_state(h1b_frame)
+salary_by_employer(h1b_frame)
