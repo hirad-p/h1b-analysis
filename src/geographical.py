@@ -140,6 +140,7 @@ def employer_by_state(frame):
 
     states_frame = states_frame.sort_values('count')
     print(states_frame)
+    states_frame.to_csv('../data/top_employer_by_state.csv')
 
     X = states_frame[['code']].values.flatten()
     Y = states_frame[['count']].values.flatten()
@@ -173,4 +174,4 @@ def get_county(coordinate):
 # number_by_state(h1b_frame, 'California')
 # number_by_state(h1b_frame, 'Texas')
 # number_by_state(h1b_frame, 'New York')
-# employer_by_state(h1b_frame)
+employer_by_state(h1b_frame)
