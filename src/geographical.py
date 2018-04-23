@@ -1,5 +1,4 @@
 import folium
-import json
 import numpy as np
 import pandas as pd
 import plotly.plotly as py
@@ -51,6 +50,70 @@ def number_by_states(frame):
     folium.LayerControl().add_to(m)
 
     m.save('../graphs/applications_by_states.html')
+
+
+def certified_by_state(frame):
+    # Certified H1Bs by State
+    t = frame.loc[frame['CASE_STATUS'] == 'CERTIFIED']['WORKSITE'].value_counts()
+    geo_frame = pd.read_csv('../data/state_geocodes.csv')
+
+    states = geo_frame['name'].tolist()
+    states_frame = geo_frame.drop('fips', axis=1)
+    states_frame['count'] = 0
+    states_frame = states_frame.set_index('name')
+
+    for worksite, count in t.items():
+        state = worksite.split(',')[1].strip().lower().title()
+        if state in states_frame.index.values:
+            states_frame.at[state, 'count'] += count
+
+            
+    states_frame = states_frame.sort_values('count')
+
+    X = states_frame[['code']].values.flatten()
+    Y = states_frame[['count']].values.flatten()
+
+    trace_states = go.Bar(
+        x=X, 
+        y=Y, 
+        name="State", 
+        text=Y, 
+        textposition = 'auto')
+
+    data = [trace_states]
+    layout = go.Layout(
+        title="H1Bs by State",
+        barmode='stack'  
+    )
+    fig = go.Figure(
+        data=data, 
+        layout=layout
+    )
+    py.iplot(fig, 
+        filename='stacked-bar', 
+    )
+
+    # top 10
+    X = states_frame[['code']].values.flatten()[-10:]
+    Y = states_frame[['count']].values.flatten()[-10:]
+    trace_states = go.Bar(x=X, 
+                        y=Y, 
+                        name="State", 
+                        text=Y, 
+                        textposition = 'auto')
+
+    data = [trace_states]
+    layout = go.Layout(
+        title="H1Bs by State",
+        barmode='stack'  
+    )
+    fig = go.Figure(
+        data=data, 
+        layout=layout
+    )
+    py.iplot(fig, 
+        filename='stacked-bar', 
+    )
 
 
 def number_by_state(frame, state):
@@ -206,4 +269,4 @@ def get_county(coordinate):
 # number_by_state(h1b_frame, 'Texas')
 # number_by_state(h1b_frame, 'New York')
 # employer_by_state(h1b_frame)
-salary_by_employer(h1b_frame)
+# salary_by_employer(h1b_frame)
