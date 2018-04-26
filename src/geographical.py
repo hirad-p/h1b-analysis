@@ -192,41 +192,70 @@ def employer_by_state(frame):
     states_frame['count'] = 0
     states_frame = states_frame.set_index('name')
 
-    for state in states_frame.index:
-        print(f'Computing {state}...')
+    states = ['California', 'Texas', 'New York']
+    for state in states:
+        columns = ['employer', 'count']
+        df = pd.DataFrame(columns=columns)
+            
         data = frame[frame['CASE_STATUS'] == 'CERTIFIED'][frame['WORKSITE'].str.contains(state.upper())]
         counts = data['EMPLOYER_NAME'].value_counts()
-        top_employer = counts.keys().tolist()[0]
-        top_count = counts.tolist()[0]
-        states_frame.at[state, 'top_employer'] = top_employer
-        states_frame.at[state, 'count'] = top_count
 
-    states_frame = states_frame.sort_values('count')
-    # print(states_frame)
-    states_frame.to_csv('../data/top_employer_by_state.csv')
+        top_employer = counts.keys().tolist()
+        top_count = counts.tolist()
 
-    X = states_frame[['code']].values.flatten()
-    Y = states_frame[['count']].values.flatten()
-    text = states_frame[['top_employer']].values.flatten()
+        df['employer'] = top_employer
+        df['count'] = top_count
+        df = df.sort_values('count')
 
-    trace_states = go.Bar(
-        x=X, 
-        y=Y, 
-        name="State", 
-        text=text, 
-        textposition = 'auto')
+        X = df[['employer']].values.flatten()[-5:]
+        Y = df[['count']].values.flatten()[-5:]
+        text = states_frame[['top_employer']].values.flatten()
+      
+        trace_states = go.Bar(
+            x=X, 
+            y=Y, 
+            name="State", 
+            text=text, 
+            textposition = 'auto')
 
-    data = [trace_states]
-    layout = go.Layout(
-        title="H1Bs by State",
-        barmode='stack'  
-    )
-    fig = go.Figure(
-        data=data, 
-        layout=layout
-    )
-    py.iplot(fig, filename='stacked-bar')
-    py.image.save_as(fig, filename=f'../graphs/employer_by_state.png')
+        data = [trace_states]
+        layout = go.Layout(
+            title=f'H1Bs by Employer - {state}',
+            barmode='stack'  
+        )
+        fig = go.Figure(
+            data=data, 
+            layout=layout
+        )
+        py.iplot(fig, filename='stacked-bar')
+        py.image.save_as(fig, filename=f'../graphs/top_employer_{state}.png')
+
+    # states_frame = states_frame.sort_values('count')
+    # # print(states_frame)
+    # states_frame.to_csv('../data/top_employer_by_state.csv')
+
+    # X = states_frame[['code']].values.flatten()
+    # Y = states_frame[['count']].values.flatten()
+    # text = states_frame[['top_employer']].values.flatten()
+
+    # trace_states = go.Bar(
+    #     x=X, 
+    #     y=Y, 
+    #     name="State", 
+    #     text=text, 
+    #     textposition = 'auto')
+
+    # data = [trace_states]
+    # layout = go.Layout(
+    #     title="H1Bs by State",
+    #     barmode='stack'  
+    # )
+    # fig = go.Figure(
+    #     data=data, 
+    #     layout=layout
+    # )
+    # py.iplot(fig, filename='stacked-bar')
+    # py.image.save_as(fig, filename=f'../graphs/employer_by_state.png')
 
 
 def salary_by_employer(frame):
@@ -268,5 +297,5 @@ def get_county(coordinate):
 # number_by_state(h1b_frame, 'California')
 # number_by_state(h1b_frame, 'Texas')
 # number_by_state(h1b_frame, 'New York')
-# employer_by_state(h1b_frame)
+employer_by_state(h1b_frame)
 # salary_by_employer(h1b_frame)
